@@ -59,7 +59,7 @@ ls
 [[ -f /etc/ssh/sshd_config ]] && mv /etc/ssh/sshd_config /etc/ssh/sshd_config.$(date +%Y%m%d)
 
 # Install rpm packages. Exclude all debug packages.
-find . ! -name '*debug*' -name '*.rpm' | xargs sudo yum --disablerepo=* localinstall -y
+find . ! -name '*debug*' -name '*.rpm' | xargs sudo yum --disablerepo=* localinstall -y --allowerasing
 
 # in case host key files got permissions too open.
 chmod -v 600 /etc/ssh/ssh_host_*_key
@@ -97,10 +97,39 @@ If still not satisfied, you may try the final wepon: FORCED INSTALL.
 rpm -ivh --force --nodeps --replacepkgs --replacefiles openssh-*.rpm
 ```
 
-
 ## Use Docker
 
-See file `docker.README.md`
+### TL;DR
+
+```bash
+# Define output directory
+OUTPUT="/tmp/openssh-rpms"
+# Specify build os and versions
+declare -A MAPPING
+MAPPING["amazonlinux2023"]="amzn2023"
+MAPPING["amazonlinux2"]="amzn2"
+MAPPING["amazonlinux1"]="amzn1"
+MAPPING["centos-stream9"]="el7"
+MAPPING["centos-stream8"]="el7"
+MAPPING["centos7"]="el7"
+MAPPING["centos6"]="el6"
+# CentOS 5 is NOT valid.
+# MAPPING["centos5"]="el5"
+
+for VERSION in "${!MAPPING[@]}";
+do
+  DIST=${MAPPING[$VERSION]}
+  echo "Create for OS: ${VERSION}"
+  mkdir -p $OUTPUT/$VERSION
+  # Run the builder container
+  docker run -it --rm \
+             -v $OUTPUT/$VERSION:/data/$DIST/RPMS \
+             chowrex/openssh-rpms:$VERSION
+done
+
+```
+
+For more details, see file `docker.README.md`
 
 ## Security Notes
 
