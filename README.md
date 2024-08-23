@@ -11,6 +11,7 @@ Similar Project: [Backport OpenSSH for Debian / Ubuntu distros](https://github.c
 - UnionTech OS Server 20
 - openEuler 22.03 (LTS-SP1)
 - AnolisOS 7.9/8.6
+- Kylin V10 SP3
 
 ## Current Version:
 
